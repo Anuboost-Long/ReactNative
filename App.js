@@ -3,8 +3,10 @@ import {
   Text,
   View,
   TouchableOpacity,
-  Image,
   FlatList,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import React, { useState } from "react";
 import Header from "./components/header/header";
@@ -18,11 +20,24 @@ export default function App() {
     { text: "play on the switch", key: "3" },
   ]);
 
+  const handleCreateTask = (task) => {
+    if (task.length > 3) {
+      setTodos((prevTodo) => {
+        return [{ text: task, key: Math.random().toString() }, ...prevTodo];
+      });
+    } else {
+      Alert.alert(
+        "Invalid",
+        "Your to do list is too short, 3 character or above",
+        [{ text: "Aight !!", onPress: () => console.log("Yamete Kudasai!") }]
+      );
+    }
+  };
+
   const handlePressed = (key) => {
     setTodos((thisTodos) => {
       return thisTodos.filter((item) => item.key != key);
     });
-    console.log(key);
   };
 
   const returnAll = () => {
@@ -33,63 +48,47 @@ export default function App() {
     ]);
   };
   return (
-    <View style={styles.container}>
-      <Header />
-      <View style={styles.content}>
-        <AddItem />
-        <View style={styles.list}>
-          <FlatList
-            data={todos}
-            renderItem={({ item }) => (
-              <TodoItems item={item} handlePressed={handlePressed} />
-            )}
-          />
-        </View>
-        <View style={styles.returnView}>
-          <TouchableOpacity onPress={() => returnAll()}>
-            <Text style={styles.returnButton}> Return the list </Text>
-          </TouchableOpacity>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <View style={styles.container}>
+        <Header />
+        <View style={styles.content}>
+          <AddItem handleCreateTask={handleCreateTask} />
+          <View style={styles.list}>
+            <FlatList
+              data={todos}
+              renderItem={({ item }) => (
+                <TodoItems item={item} handlePressed={handlePressed} />
+              )}
+            />
+          </View>
+          <View style={styles.returnView}>
+            <TouchableOpacity onPress={() => returnAll()}>
+              <Text style={styles.returnButton}> Return the list </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  itemWrapperStyle: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderColor: "#85DCBA",
-  },
-  itemImageStyle: {
-    width: 50,
-    height: 50,
-    marginRight: 16,
-  },
-  contentWrapperStyle: {
-    justifyContent: "space-around",
-  },
-  txtNameStyle: {
-    color: "#85DCBA",
-    fontSize: 16,
-  },
-  txtEmailStyle: {
-    color: "#85DCBA",
-  },
-
-  loaderStyle: {
-    marginVertical: 16,
-    alignItems: "center",
-  },
-
   container: {
+    flex: 1,
     backgroundColor: "black",
-    marginTop: 50,
+  },
+
+  content: {
+    padding: 20,
+    flex: 1,
   },
 
   list: {
+    flex: 1,
     paddingHorizontal: 20,
   },
 
